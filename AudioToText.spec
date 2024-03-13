@@ -42,6 +42,6 @@ app = BUNDLE(
     icon='icon.ico',
     bundle_identifier=None,
     author='hammon5tl',
-    version='0.0.1-beta',
+    version='0.0.2',
     description='Simple audio to text converter, only accepts .wav, .aiff and .flac files and Italian language'
 )

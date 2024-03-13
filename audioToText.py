@@ -1,7 +1,10 @@
+import time
 import speech_recognition as sr
 from tkinter import *
 from tkinter import filedialog, messagebox, scrolledtext
 from threading import Thread
+from mutagen.wave import WAVE
+import datetime
 import os
 
 
@@ -10,6 +13,7 @@ class App:
         self.root = Tk()
         self.root.title("Audio To Text")
         self.root.minsize(850, 400)
+        self.converting = False
 
         self.buttons_frame = Frame(self.root)
         self.buttons_frame.grid(row=0, column=0, padx=7, pady=10, sticky=W+E)
@@ -22,6 +26,9 @@ class App:
         self.save_button = Button(self.buttons_frame, text="Save Text", command=lambda : self.save_text_file())
         self.save_button.configure(state=DISABLED)
         self.save_button.grid(row=0, column=2, padx=3)
+        self.remaining = Label(self.buttons_frame, text="")
+        self.remaining.grid(row=0, column=3, padx=3)
+
 
         self.areas_frame = Frame(self.root)
         self.areas_frame.grid(row=1, column=0, padx=10, pady=16, sticky=E+W+N+S)
@@ -68,6 +75,7 @@ class App:
 
     def convert_audio_to_text(self):
         self.start_loading()
+
         recognizer = sr.Recognizer()
         audio_file = self.file_list.get(ANCHOR)
         
@@ -76,7 +84,7 @@ class App:
                 audio = recognizer.record(source)
         except Exception as e:
             messagebox.showerror("Error", f"Could not open the audio file: {e}")
-            self.enable_all()
+            self.end_loading()
             return
 
         try: 
@@ -96,19 +104,23 @@ class App:
         
     
     def start_loading(self):
+        self.converting = True
         self.convert_button.configure(state=DISABLED)
         self.save_button.configure(state=DISABLED)
         self.add_button.configure(state=DISABLED)
         self.file_list.configure(state=DISABLED)
         self.old_title = self.root.title()
         self.root.title("Audio To Text - Converting...")
+        Thread(target=self.timer).start()
 
 
     def end_loading(self):
+        self.converting = False
         self.add_button.configure(state=NORMAL)
         self.file_list.configure(state=NORMAL)
         self.root.title(self.old_title)
         self.listbox_bind_trigger()
+        self.remaining.configure(text="")
 
 
     def update_text_area(self, text):
@@ -148,8 +160,24 @@ class App:
 
         messagebox.showinfo("Done", f"File saved at: {file_path}")
         
-        self.root.grab_release()
+        self.root.grab_release()        
     
+
+    def timer(self):
+        audio_file = self.file_list.get(ANCHOR)
+        audio_file = WAVE(audio_file)
+        duration = audio_file.info.length
+        duration = duration // 2
+        self.remaining.configure(text=f"Expected remaining time: {self.to_time(duration)}")
+        while duration > 0 and self.converting == True:
+            time.sleep(1)
+            duration -= 1
+            self.remaining.configure(text=f"Expected remaining time: {self.to_time(duration)}")
+    
+
+    def to_time(self, length): 
+        return datetime.timedelta(seconds=length)
+
 
     def run(self):
         self.root.mainloop()
