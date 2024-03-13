@@ -16,7 +16,7 @@ class App:
 
         self.add_button = Button(self.buttons_frame, text="Add New Audio File", command=lambda : self.add_audio_file())
         self.add_button.grid(row=0, column=0, padx=3)
-        self.convert_button = Button(self.buttons_frame, text="Convert To Text", command=lambda : self.convert_audio_to_text(self.file_list.get(ACTIVE)))
+        self.convert_button = Button(self.buttons_frame, text="Convert To Text", command=lambda : self.convert_audio_to_text(self.file_list.get(ANCHOR)))
         self.convert_button.config(state=DISABLED)
         self.convert_button.grid(row=0, column=1, padx=3)
         self.save_button = Button(self.buttons_frame, text="Save Text", command=lambda : self.save_text_file(self.text_area.get(1.0, END)))
@@ -46,10 +46,14 @@ class App:
         
         
     def listbox_bind_trigger(self):
-        self.convert_button.config(state=NORMAL)
-        if self.map_file_to_text[self.file_list.get(ACTIVE)]:
-            self.update_text_area(self.map_file_to_text[self.file_list.get(ACTIVE)])
+        if self.file_list.get(ANCHOR):
+            self.convert_button.config(state=NORMAL)
+            if self.map_file_to_text[self.file_list.get(ANCHOR)]:
+                self.update_text_area(self.map_file_to_text[self.file_list.get(ANCHOR)])
+            else:
+                self.update_text_area("")
         else:
+            self.convert_button.config(state=DISABLED)
             self.update_text_area("")
     
     def text_area_bind_trigger(self):
