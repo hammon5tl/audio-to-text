@@ -74,7 +74,7 @@ class App:
         with sr.AudioFile(audio_file) as source:
             audio = recognizer.record(source)
 
-        try:
+        try: 
             text = recognizer.recognize_google(audio, language='it-IT')
             if text:
                 self.map_file_to_text[audio_file] = text
