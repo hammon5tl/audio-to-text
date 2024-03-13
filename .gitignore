@@ -5,3 +5,4 @@ setup_mac.py
 setup_win.py
 build/
 dist/
+test/
