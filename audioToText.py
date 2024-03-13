@@ -54,7 +54,7 @@ class App:
         
     def listbox_bind_trigger(self):
         if self.file_list.get(ANCHOR):
-            self.root.title(f"Audio To Text - \"{self.file_list.get(ANCHOR).split('/')[-1]}\" Selected")
+            self.root.title(f"Audio To Text - \"{self.file_list.get(ANCHOR).split('/')[-1]}\"")
             self.convert_button.configure(state=NORMAL)
             if self.map_file_to_text[self.file_list.get(ANCHOR)]:
                 self.update_text_area(self.map_file_to_text[self.file_list.get(ANCHOR)])
@@ -84,6 +84,7 @@ class App:
             if text:
                 self.map_file_to_text[audio_file] = text
                 self.update_text_area(text)
+                messagebox.showinfo("Done", f"\"{audio_file.split('/')[-1]}\" successfully converted to text")
         except sr.UnknownValueError:
             messagebox.showwarning("Warning", "Google Speech Recognition could not understand the audio")
         except sr.RequestError as e:
@@ -109,6 +110,7 @@ class App:
         self.root.title(self.old_title)
         self.listbox_bind_trigger()
 
+
     def update_text_area(self, text):
         self.text_area.configure(state=NORMAL)
         self.text_area.delete('1.0', END)
@@ -122,7 +124,7 @@ class App:
 
     def add_audio_file(self):
         self.root.grab_set()
-        audio_file = filedialog.askopenfilename(filetypes=[("Audio Files", "*.wav")],
+        audio_file = filedialog.askopenfilename(filetypes=[("Audio Files", "*.wav"), ("Audio Files", "*.flac"), ("Audio Files", "*.aiff")],
             title="Select an audio file")
         if audio_file:
             for file in self.file_list.get(0, END):
@@ -143,6 +145,8 @@ class App:
         if file_path:
             with open(file_path, "w") as file:
                 file.write(body)
+
+        messagebox.showinfo("Done", f"File saved at: {file_path}")
         
         self.root.grab_release()
     
