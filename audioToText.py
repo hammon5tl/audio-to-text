@@ -126,6 +126,11 @@ class App:
         audio_file = filedialog.askopenfilename(filetypes=[("Audio Files", "*.wav")],
             title="Select an audio file")
         if audio_file:
+            for file in self.file_list.get(0, END):
+                if file == audio_file:
+                    messagebox.showwarning("Warning", "This audio file is already in the list")
+                    self.root.grab_release()
+                    return
             self.file_list.insert(END, audio_file)
             self.map_file_to_text[audio_file] = ""
         self.root.grab_release()
