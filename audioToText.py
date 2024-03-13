@@ -56,12 +56,14 @@ class App:
         
     def listbox_bind_trigger(self):
         if self.file_list.get(ANCHOR):
+            self.root.title(f"Audio To Text - \"{self.file_list.get(ANCHOR).split('/')[-1]}\" Selected")
             self.convert_button.configure(state=NORMAL)
             if self.map_file_to_text[self.file_list.get(ANCHOR)]:
                 self.update_text_area(self.map_file_to_text[self.file_list.get(ANCHOR)])
             else:
                 self.update_text_area("")
         else:
+            self.root.title("Audio To Text")
             self.convert_button.configure(state=DISABLED)
             self.update_text_area("")
         
