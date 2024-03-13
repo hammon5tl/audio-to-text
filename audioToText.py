@@ -128,7 +128,7 @@ class App:
         if audio_file:
             for file in self.file_list.get(0, END):
                 if file == audio_file:
-                    messagebox.showwarning("Warning", "This audio file is already in the list")
+                    messagebox.showerror("Error", "This audio file is already in the list")
                     self.root.grab_release()
                     return
             self.file_list.insert(END, audio_file)
