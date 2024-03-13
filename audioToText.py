@@ -1,8 +1,6 @@
 import speech_recognition as sr
 from tkinter import *
-from tkinter import filedialog
-from tkinter import messagebox
-from tkinter import scrolledtext
+from tkinter import filedialog, messagebox, scrolledtext
 from threading import Thread
 import os
 
@@ -18,10 +16,10 @@ class App:
 
         self.add_button = Button(self.buttons_frame, text="Add New Audio File", command=lambda : self.add_audio_file())
         self.add_button.grid(row=0, column=0, padx=3)
-        self.convert_button = Button(self.buttons_frame, text="Convert To Text", command=lambda : Thread(target=self.convert_audio_to_text, args=(self.file_list.get(ANCHOR), )).start())
+        self.convert_button = Button(self.buttons_frame, text="Convert To Text", command=lambda : Thread(target=self.convert_audio_to_text).start())
         self.convert_button.configure(state=DISABLED)
         self.convert_button.grid(row=0, column=1, padx=3)
-        self.save_button = Button(self.buttons_frame, text="Save Text", command=lambda : self.save_text_file(self.text_area.get('1.0', END)))
+        self.save_button = Button(self.buttons_frame, text="Save Text", command=lambda : self.save_text_file())
         self.save_button.configure(state=DISABLED)
         self.save_button.grid(row=0, column=2, padx=3)
 
@@ -68,9 +66,10 @@ class App:
             self.update_text_area("")
         
 
-    def convert_audio_to_text(self, audio_file):
+    def convert_audio_to_text(self):
         self.start_loading()
         recognizer = sr.Recognizer()
+        audio_file = self.file_list.get(ANCHOR)
         
         try:
             with sr.AudioFile(audio_file) as source:
@@ -136,9 +135,10 @@ class App:
         self.root.grab_release()
     
 
-    def save_text_file(self, body):
+    def save_text_file(self):
         self.root.grab_set()
         file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt")], title="Save the text file")
+        body = self.text_area.get('1.0', END)
 
         if file_path:
             with open(file_path, "w") as file:
