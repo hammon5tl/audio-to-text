@@ -1,5 +1,4 @@
 import speech_recognition as sr
-from pydub import AudioSegment
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
@@ -71,19 +70,6 @@ class App:
     def convert_audio_to_text(self, audio_file):
         self.root.grab_set()
         recognizer = sr.Recognizer()
-        deleteConvertedFile = False
-        og_name = audio_file
-
-        if not audio_file.endswith('.wav'):
-            output_file = audio_file + '.wav'
-            try:
-                self.convert_to_wav(audio_file, output_file)
-            except Exception as e:
-                messagebox.showerror("Error", f"An error occurred while converting the file: {e}")
-                self.root.grab_release()
-                return
-            audio_file = output_file
-            deleteConvertedFile = True
         
         with sr.AudioFile(audio_file) as source:
             audio = recognizer.record(source)
@@ -91,15 +77,13 @@ class App:
         try:
             text = recognizer.recognize_google(audio, language='it-IT')
             if text:
-                self.map_file_to_text[og_name] = text
+                self.map_file_to_text[audio_file] = text
                 self.update_text_area(text)
         except sr.UnknownValueError:
             messagebox.showwarning("Warning", "Google Speech Recognition could not understand the audio")
         except sr.RequestError as e:
             messagebox.showerror("Error", f"Could not request results from Google Speech Recognition service; {e}")
         
-        if deleteConvertedFile:
-            os.remove(audio_file)
         self.root.grab_release()
 
 
@@ -112,26 +96,11 @@ class App:
             self.save_button.configure(state=NORMAL)
         else:
             self.save_button.configure(state=DISABLED)
-    
-
-    def convert_to_wav(self, input_file, output_file):
-        audio = AudioSegment.from_file(input_file)
-        audio.export(output_file, format='wav')
 
 
     def add_audio_file(self):
         self.root.grab_set()
-        audio_file = filedialog.askopenfilename(filetypes=[
-            ("Audio Files", "*.wav"),
-            ("Audio Files", "*.mp3"),
-            ("Audio Files", "*.ogg"),
-            ("Audio Files", "*.flac"),
-            ("Audio Files", "*.wma"),
-            ("Audio Files", "*.m4a"),
-            ("Audio Files", "*.aiff"),
-            ("Audio Files", "*.aif"),
-            ("Audio Files", "*.aac"),
-            ],
+        audio_file = filedialog.askopenfilename(filetypes=[("Audio Files", "*.wav")],
             title="Select an audio file")
         if audio_file:
             self.file_list.insert(END, audio_file)
