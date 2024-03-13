@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import scrolledtext
+from threading import Thread
 import os
 
 
@@ -17,7 +18,7 @@ class App:
 
         self.add_button = Button(self.buttons_frame, text="Add New Audio File", command=lambda : self.add_audio_file())
         self.add_button.grid(row=0, column=0, padx=3)
-        self.convert_button = Button(self.buttons_frame, text="Convert To Text", command=lambda : self.convert_audio_to_text(self.file_list.get(ANCHOR)))
+        self.convert_button = Button(self.buttons_frame, text="Convert To Text", command=lambda : Thread(target=self.convert_audio_to_text, args=(self.file_list.get(ANCHOR), )).start())
         self.convert_button.configure(state=DISABLED)
         self.convert_button.grid(row=0, column=1, padx=3)
         self.save_button = Button(self.buttons_frame, text="Save Text", command=lambda : self.save_text_file(self.text_area.get('1.0', END)))
@@ -68,11 +69,16 @@ class App:
         
 
     def convert_audio_to_text(self, audio_file):
-        self.root.grab_set()
+        self.start_loading()
         recognizer = sr.Recognizer()
         
-        with sr.AudioFile(audio_file) as source:
-            audio = recognizer.record(source)
+        try:
+            with sr.AudioFile(audio_file) as source:
+                audio = recognizer.record(source)
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not open the audio file: {e}")
+            self.enable_all()
+            return
 
         try: 
             text = recognizer.recognize_google(audio, language='it-IT')
@@ -82,10 +88,27 @@ class App:
         except sr.UnknownValueError:
             messagebox.showwarning("Warning", "Google Speech Recognition could not understand the audio")
         except sr.RequestError as e:
-            messagebox.showerror("Error", f"Could not request results from Google Speech Recognition service; {e}")
+            messagebox.showerror("Error", f"Could not request results from Google Speech Recognition service: {e}")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
         
-        self.root.grab_release()
+        self.end_loading()
+        
+    
+    def start_loading(self):
+        self.convert_button.configure(state=DISABLED)
+        self.save_button.configure(state=DISABLED)
+        self.add_button.configure(state=DISABLED)
+        self.file_list.configure(state=DISABLED)
+        self.old_title = self.root.title()
+        self.root.title("Audio To Text - Converting...")
 
+
+    def end_loading(self):
+        self.add_button.configure(state=NORMAL)
+        self.file_list.configure(state=NORMAL)
+        self.root.title(self.old_title)
+        self.listbox_bind_trigger()
 
     def update_text_area(self, text):
         self.text_area.configure(state=NORMAL)
