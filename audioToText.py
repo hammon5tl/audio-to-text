@@ -103,6 +103,7 @@ class App:
 
     def update_text_area(self, text):
         self.text_area.configure(state=NORMAL)
+        self.text_area.delete('1.0', END)
         self.text_area.insert(END, text)
         self.text_area.configure(state=DISABLED)
         if len(text) > 0:
