@@ -1,6 +1,5 @@
 
 .DS_Store
-audioToText.spec
 setup_mac.py
 setup_win.py
 build/
