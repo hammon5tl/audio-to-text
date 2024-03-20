@@ -1,3 +1,3 @@
 # audio-to-text
  
-A simple audio to text converter. Only supports .wav, .flac and .aiff files and Italian language (as of now).
+A simple audio to text converter. Only supports .wav, .mp3 and .m4a files and Italian language (as of now).

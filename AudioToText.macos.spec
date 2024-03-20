@@ -43,5 +43,5 @@ app = BUNDLE(
     bundle_identifier=None,
     author='hammon5tl',
     version='0.0.2',
-    description='Simple audio to text converter, only accepts .wav, .aiff and .flac files and Italian language'
+    description='Simple audio to text converter, only accepts .wav, .mp3 and .m4a files and Italian language'
 )

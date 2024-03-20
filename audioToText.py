@@ -1,5 +1,5 @@
 import time
-import speech_recognition as sr
+import whisper
 from tkinter import *
 from tkinter import filedialog, messagebox, scrolledtext
 from threading import Thread
@@ -76,27 +76,16 @@ class App:
     def convert_audio_to_text(self):
         self.start_loading()
 
-        recognizer = sr.Recognizer()
         audio_file = self.file_list.get(ANCHOR)
-        
-        try:
-            with sr.AudioFile(audio_file) as source:
-                audio = recognizer.record(source)
-        except Exception as e:
-            messagebox.showerror("Error", f"Could not open the audio file: {e}")
-            self.end_loading()
-            return
 
-        try: 
-            text = recognizer.recognize_google(audio, language='it-IT')
+        try:
+            model = whisper.load_model("base")
+            result = model.transcribe(audio_file)
+            text = result["text"]
             if text:
                 self.map_file_to_text[audio_file] = text
                 self.update_text_area(text)
                 messagebox.showinfo("Done", f"\"{audio_file.split('/')[-1]}\" successfully converted to text")
-        except sr.UnknownValueError:
-            messagebox.showwarning("Warning", "Google Speech Recognition could not understand the audio")
-        except sr.RequestError as e:
-            messagebox.showerror("Error", f"Could not request results from Google Speech Recognition service: {e}")
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
         
@@ -136,7 +125,7 @@ class App:
 
     def add_audio_file(self):
         self.root.grab_set()
-        audio_file = filedialog.askopenfilename(filetypes=[("Audio Files", "*.wav"), ("Audio Files", "*.flac"), ("Audio Files", "*.aiff")],
+        audio_file = filedialog.askopenfilename(filetypes=[("Audio Files", "*.wav"), ("Audio Files", "*.mp3"), ("Audio Files", "*.m4a")],
             title="Select an audio file")
         if audio_file:
             for file in self.file_list.get(0, END):
@@ -167,7 +156,7 @@ class App:
         audio_file = self.file_list.get(ANCHOR)
         audio_file = WAVE(audio_file)
         duration = audio_file.info.length
-        duration = duration // 2
+        duration = 2 + (duration // 25)
         self.remaining.configure(text=f"Expected remaining time: {self.to_time(duration)}")
         while duration > 0 and self.converting == True:
             time.sleep(1)
