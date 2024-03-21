@@ -5,3 +5,4 @@ setup_win.py
 build/
 dist/
 test/
+ffmpeg/

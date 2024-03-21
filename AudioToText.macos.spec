@@ -1,11 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+added_files = [
+    ( './ffmpeg/6.1.1_5/bin/*', '.' )
+]
 
 a = Analysis(
     ['audioToText.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=added_files,
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -43,5 +46,5 @@ app = BUNDLE(
     bundle_identifier=None,
     author='hammon5tl',
     version='0.0.2',
-    description='Simple audio to text converter, only accepts .wav, .mp3 and .m4a files and Italian language'
+    description='Simple audio to text converter, only accepts .wav, .mp3 and .m4a files'
 )
